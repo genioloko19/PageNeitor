@@ -140,7 +140,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const params = new URLSearchParams(window.location.search);
     const deepView = params.get('view');
-    if (deepView === 'analytics') await openAnalyticsView();
+
+    if (deepView === 'analytics') {
+      if (params.get('mode') === 'advanced') {
+        State.analytics.mode = 'advanced';
+        applyAnalyticsMode();
+      }
+      await openAnalyticsView();
+      if (params.get('insights') === '1') {
+        await generateAnalyticsInsights(false);
+      }
+    }
     if (deepView === 'domain' && params.get('domain')) {
       await openDomainDetail(params.get('domain'));
     }
@@ -149,7 +159,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       const deepUrls = params.get('urls');
       if (deepUrls) {
         document.getElementById('linkAssistantText').value = deepUrls;
-        analyzeAssistantLinks();
+        analyzeAssistantLinks(params.get('use_llm') !== '0');
+      }
+    }
+    if (deepView === 'chat') {
+      const chatSession = params.get('session');
+      if (chatSession && await restoreChatSession(chatSession, true)) {
+        // restored and opened
+      } else {
+        toggleChatPanel(true);
+      }
+    }
+    if (deepView === 'credentials' && params.get('link_id')) {
+      await openCredentialsModal(params.get('link_id'));
+    }
+    if (deepView === 'notifications') {
+      await openDomainNotifications();
+    }
+    if (deepView === 'control') {
+      document.getElementById('menuActionControlPanel').click();
+      const tab = params.get('tab');
+      if (tab) {
+        const tabBtn = document.querySelector(`.cp-tab-btn[data-cptab="${tab}"]`);
+        if (tabBtn) tabBtn.click();
       }
     }
   } catch (err) {}
@@ -2021,7 +2053,7 @@ function renderAssistantPreview(preview) {
   const items = State.linkAssistant.items;
 
   document.getElementById('linkAssistantStatus').innerHTML =
-    `<i class="fa-solid fa-circle-info"></i> ${items.length} enlace(s) · ` +
+    `<i class="fa-solid fa-circle-info"></i> ${items.length} ${items.length === 1 ? 'enlace' : 'enlaces'} · ` +
     `Clasificación: <strong>${escapeHtml(preview.source || 'Reglas locales')}</strong>`;
 
   if (!items.length) {
@@ -2052,7 +2084,7 @@ function renderAssistantPreview(preview) {
          </div>`
       : '';
     const domainBadge = item.domain_exists
-      ? `<span class="assistant-badge existing"><i class="fa-solid fa-globe"></i> Dominio existente · ${item.domain_count} enlaces</span>`
+      ? `<span class="assistant-badge existing"><i class="fa-solid fa-globe"></i> Dominio existente · ${item.domain_count} ${item.domain_count === 1 ? 'enlace' : 'enlaces'}</span>`
       : `<span class="assistant-badge new"><i class="fa-solid fa-star"></i> Dominio nuevo</span>`;
     const duplicateBadge = item.duplicate
       ? '<span class="assistant-badge duplicate"><i class="fa-solid fa-triangle-exclamation"></i> Posible duplicado</span>'
@@ -2112,7 +2144,7 @@ function collectAssistantItems() {
   return result;
 }
 
-async function analyzeAssistantLinks() {
+async function analyzeAssistantLinks(useLlm = true) {
   const text = document.getElementById('linkAssistantText').value.trim();
   if (!text) {
     showToast('Pega al menos una URL', 'info');
@@ -2124,7 +2156,7 @@ async function analyzeAssistantLinks() {
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analizando...';
   status.textContent = 'Extrayendo metadatos y clasificando con IA local...';
   try {
-    const preview = await API.previewLinks(text, true);
+    const preview = await API.previewLinks(text, useLlm);
     if (!preview || preview.success === false) {
       status.textContent = (preview && preview.error) || 'No se pudo analizar.';
       showToast(status.textContent, 'error');
@@ -2579,11 +2611,11 @@ async function renderAnalyticsEvents() {
     </table>`;
 }
 
-async function generateAnalyticsInsights() {
+async function generateAnalyticsInsights(force = true) {
   const box = document.getElementById('analyticsInsights');
   const source = document.getElementById('analyticsInsightSource');
   box.innerHTML = '<div class="db-empty"><i class="fa-solid fa-spinner fa-spin"></i> Ollama está analizando las métricas...</div>';
-  const res = await API.getAnalyticsInsights(true);
+  const res = await API.getAnalyticsInsights(force);
   if (res && res.insights) {
     box.innerHTML = `<ul>${res.insights.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>`;
     source.textContent = `Fuente: ${res.source || 'local'} · ${res.generated_at || ''}`;
@@ -3421,7 +3453,7 @@ function setupEventListeners() {
   document.getElementById('btnCancelLinkAssistant').addEventListener('click', () => {
     document.getElementById('linkAssistantModal').classList.remove('active');
   });
-  document.getElementById('btnLinkAssistantAnalyze').addEventListener('click', analyzeAssistantLinks);
+  document.getElementById('btnLinkAssistantAnalyze').addEventListener('click', () => analyzeAssistantLinks(true));
   document.getElementById('btnLinkAssistantSave').addEventListener('click', saveAssistantLinks);
   document.getElementById('linkAssistantResults').addEventListener('click', (e) => {
     const remove = e.target.closest('.assistant-remove');
@@ -3476,7 +3508,7 @@ function setupEventListeners() {
   document.getElementById('btnAnalyticsRefresh').addEventListener('click', () => loadAnalyticsView(true));
   document.getElementById('btnAnalyticsMode').addEventListener('click', toggleAnalyticsMode);
   document.getElementById('btnAnalyticsExport').addEventListener('click', exportAnalyticsJson);
-  document.getElementById('btnAnalyticsAI').addEventListener('click', generateAnalyticsInsights);
+  document.getElementById('btnAnalyticsAI').addEventListener('click', () => generateAnalyticsInsights(true));
 }
 
 // Helpers for New Profile and Category Dialogs in Control Panel
