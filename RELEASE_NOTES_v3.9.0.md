@@ -43,6 +43,10 @@ La base sigue viviendo en `%APPDATA%\Pageneitor`. Recompilar no borra enlaces, c
 - Las credenciales se guardan localmente en SQLite. Protege tu cuenta de Windows y tus respaldos.
 - Highcharts se usa bajo su licencia gratuita para uso personal/no comercial.
 
+## Manual con capturas
+
+[Ver el manual visual completo con capturas de la interfaz](https://github.com/genioloko19/PageNeitor#-manual-visual)
+
 ## Enlaces
 
 - [Repositorio](https://github.com/genioloko19/PageNeitor)
