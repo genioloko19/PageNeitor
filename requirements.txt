@@ -3,7 +3,7 @@ Flask>=3.0.0
 Flask-Cors>=4.0.0
 requests>=2.31.0
 PySide6>=6.6.0
-Pillow>=10.0.0
+Pillow>=13.0.0
 
 # Build dependency for the Windows executable
 pyinstaller>=6.0.0
