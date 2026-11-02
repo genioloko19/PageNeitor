@@ -1,5 +1,5 @@
 """
-Database module for Pageneitor v3.9.
+Database module for Pageneitor v3.9.1.
 Handles SQLite persistence for:
 - Links with multi-account credentials and associated sub-links / tabs
 - Topics/categories and browser profiles with full CRUD
@@ -1595,7 +1595,7 @@ def export_database_json():
 
     return {
         "app": "Pageneitor",
-        "version": "3.9",
+        "version": "3.9.1",
         "exported_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "profiles": profiles,
         "categories": categories,

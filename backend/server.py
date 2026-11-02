@@ -1,5 +1,5 @@
 """
-Flask REST API server for Pageneitor v3.9.
+Flask REST API server for Pageneitor v3.9.1.
 Serves frontend static files and handles:
 - Link cataloging, metadata extraction, search, and filtering
 - Multi-account credentials vault per link
@@ -141,7 +141,7 @@ def static_proxy(path):
 
 @app.route("/api/status", methods=["GET"])
 def status():
-    return jsonify({"status": "ok", "app": "Pageneitor", "version": "3.9.0", "db_path": DB_PATH})
+    return jsonify({"status": "ok", "app": "Pageneitor", "version": "3.9.1", "db_path": DB_PATH})
 
 @app.route("/api/db/info", methods=["GET"])
 def db_info():

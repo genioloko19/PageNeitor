@@ -1,5 +1,5 @@
 """
-Pageneitor - Main Desktop Application Launcher v3.9.
+Pageneitor - Main Desktop Application Launcher v3.9.1.
 Combines Python backend with high-performance Chromium WebEngine.
 Includes global crash logger, graceful error recovery, and robust port management.
 """

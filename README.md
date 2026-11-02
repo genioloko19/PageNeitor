@@ -17,7 +17,7 @@ Pageneitor es una aplicación de escritorio para Windows que guarda, organiza y 
 </p>
 
 <p align="center">
-  <a href="https://github.com/genioloko19/PageNeitor/releases/latest"><strong>⬇️ Descargar Pageneitor v3.9.0 para Windows</strong></a>
+  <a href="https://github.com/genioloko19/PageNeitor/releases/latest"><strong>⬇️ Descargar Pageneitor v3.9.1 para Windows</strong></a>
 </p>
 
 ---
@@ -46,7 +46,7 @@ Todo funciona **localmente**. Tus enlaces, cuentas y conversaciones viven en tu 
 ### Opción A: ejecutable para Windows
 
 1. Entra en [Releases](https://github.com/genioloko19/PageNeitor/releases/latest).
-2. Descarga `Pageneitor-v3.9.0-win64.zip`.
+2. Descarga `Pageneitor-v3.9.1-win64.zip`.
 3. Descomprime la carpeta.
 4. Ejecuta `Pageneitor.exe`.
 
@@ -503,6 +503,6 @@ MIT. Consulta [LICENSE](LICENSE) y [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.
 ---
 
 <p align="center">
-  <strong>Pageneitor v3.9.0</strong><br>
+  <strong>Pageneitor v3.9.1</strong><br>
   Hecho para mantener tu navegador y tu mente más ligeros.
 </p>

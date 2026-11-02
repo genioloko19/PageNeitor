@@ -7,6 +7,23 @@ y el versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [3.9.1] - 2026-11-02
+
+### Añadido
+- Manual visual completo con capturas reales de la interfaz.
+- Capturas para panel principal, dominios, detalle de dominio, asistente, chat, credenciales, estadísticas, base de datos, notificaciones y temas.
+- Enlaces profundos de OpenCode para abrir chat, credenciales, notificaciones y paneles concretos.
+- Enlace al manual visual desde las notas de release.
+
+### Cambiado
+- README reestructurado como introducción + manual para usuarios + sección técnica.
+- Panel de Control ampliado para mostrar todas las pestañas sin recortes.
+- Capturas optimizadas en WebP para reducir el peso del repositorio.
+
+### Corregido
+- Pluralización en el asistente de enlaces.
+- Evitado el solapamiento de toasts en capturas de demostración.
+
 ## [3.9.0] - 2026-11-02
 
 ### Añadido
@@ -93,7 +110,8 @@ y el versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
-[Unreleased]: https://github.com/genioloko19/PageNeitor/compare/v3.9.0...HEAD
+[Unreleased]: https://github.com/genioloko19/PageNeitor/compare/v3.9.1...HEAD
+[3.9.1]: https://github.com/genioloko19/PageNeitor/compare/v3.9.0...v3.9.1
 [3.9.0]: https://github.com/genioloko19/PageNeitor/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/genioloko19/PageNeitor/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/genioloko19/PageNeitor/compare/v3.6.0...v3.7.0
