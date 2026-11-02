@@ -43,10 +43,11 @@ Usar Conventional Commits:
 ### Al terminar una tarea
 
 1. Ejecutar las pruebas.
-2. Hacer commit.
+2. Hacer commit con Conventional Commits.
 3. Hacer push a la rama actual.
-4. Si el push falla, no usar `--force`; informar del error.
-5. Nunca hacer push a `main` sin confirmación si la rama no está protegida.
+4. Si la rama es `main` y el push directo está permitido, publicarlo.
+5. Si el repositorio exige Pull Request o el push es rechazado, crear una rama y abrir un PR.
+6. Si el push falla, no usar `--force`; informar del error.
 
 ## Comprobaciones mínimas
 
