@@ -37,7 +37,7 @@ jobs:
           Compress-Archive -Path "dist/Pageneitor/*" -DestinationPath "dist/Pageneitor-$tag-win64.zip" -CompressionLevel Optimal
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/Pageneitor-*-win64.zip
           generate_release_notes: true
