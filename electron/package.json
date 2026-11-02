@@ -1,0 +1,16 @@
+{
+  "name": "pageneitor",
+  "version": "1.0.0",
+  "description": "Banco visual de enlaces y catálogo anti-pestañas con interfaz glassmorphism",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win"
+  },
+  "keywords": ["tab-manager", "bookmarks", "visual", "glassmorphism", "python"],
+  "author": "Pageneitor",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.2.0"
+  }
+}

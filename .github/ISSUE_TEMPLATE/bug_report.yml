@@ -1,0 +1,75 @@
+name: 🐛 Reportar un bug
+description: Algo no funciona como debería
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar. No incluyas contraseñas, tokens ni enlaces privados.
+  - type: input
+    id: version
+    attributes:
+      label: Versión de Pageneitor
+      placeholder: "3.9.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: Forma de ejecución
+      options:
+        - Ejecutable descargado (.exe)
+        - Código fuente con Python
+        - Compilado localmente
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Versión de Windows
+      placeholder: "Windows 11 24H2"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Versión de Python (si aplica)
+      placeholder: "3.15.2"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      placeholder: |
+        1. Abrir Pageneitor
+        2. Ir a...
+        3. Pulsar...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Resultado actual
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs o capturas
+      description: Puedes pegar el contenido de pageneitor_crash.log o arrastrar imágenes.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Comprobaciones
+      options:
+        - label: He buscado issues existentes
+          required: true
+        - label: No he incluido credenciales ni datos privados
+          required: true

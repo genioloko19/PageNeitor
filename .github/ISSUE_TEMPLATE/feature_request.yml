@@ -1,0 +1,46 @@
+name: ✨ Solicitar una función
+description: Propón una mejora o nueva capacidad
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: ¿Qué problema resuelve?
+      placeholder: "Me gustaría poder..."
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta
+      placeholder: "La función podría..."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - Interfaz
+        - Enlaces
+        - Dominios
+        - Asistente / Ollama
+        - Estadísticas
+        - Base de datos / respaldos
+        - Compilación
+        - Documentación
+        - Otra
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Comprobaciones
+      options:
+        - label: He buscado solicitudes existentes
+          required: true

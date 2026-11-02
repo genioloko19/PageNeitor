@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="cyber-neon" data-mode="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pageneitor - Banco Visual de Enlaces & Antitab Manager</title>
+
+  <!-- Local vendor assets: Pageneitor works fully offline (no CDN) -->
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="vendor/animate.min.css">
+
+  <!-- SweetAlert2 -->
+  <script src="vendor/sweetalert2.all.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="vendor/chart.umd.min.js"></script>
+
+  <!-- Highcharts + modules -->
+  <script src="vendor/highcharts.js"></script>
+  <script src="vendor/highcharts-heatmap.js"></script>
+  <script src="vendor/highcharts-treemap.js"></script>
+
+  <!-- Plotly -->
+  <script src="vendor/plotly.min.js"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="vendor/confetti.browser.min.js"></script>
+
+  <!-- Glassmorphism Styles v3.0 -->
+  <link rel="stylesheet" href="styles/glass.css">
+</head>
+<body>
+  <!-- Ambient Animated Blobs for Glassmorphism backdrop -->
+  <div class="ambient-glow">
+    <!-- Capa 0: color/tema -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <!-- Capa 1: nube de palabras generada por Ollama -->
+    <canvas id="wordCloudCanvas" class="word-cloud-canvas" aria-hidden="true"></canvas>
+    <!-- Capa 2: información del sistema -->
+    <div class="system-info-layer" id="systemInfoLayer" aria-hidden="true"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- ============================================================
+         HEADER: EXACTAMENTE 4 ELEMENTOS VISIBLES
+         1. Nombre/Logo  2. Nivel  3. Selector de Modo  4. Dropdown Acciones
+         ============================================================ -->
+    <header class="glass-header">
+      <!-- 1. Nombre / Logo -->
+      <div class="header-brand" id="btnLogoHome">
+        <div class="header-logo-badge">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="header-title-box">
+          <h1>Pageneitor</h1>
+        </div>
+      </div>
+
+      <!-- 2. Nivel del Usuario (Clickable -> Abre Modal de Detalle con Festejos) -->
+      <div class="header-level-pill" id="btnOpenLevelDetail" title="Ver detalles de tu rango y estadísticas de nivel">
+        <span class="level-tag" id="headerLevelTag">LVL 1</span>
+        <span class="level-text" id="headerLevelTitle">Acumulador en Terapia</span>
+        <div class="level-mini-bar">
+          <div class="level-mini-fill" id="headerLevelMiniBar" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- Grupo Derecho: 3. Selector de Modo y 4. Dropdown de Acciones -->
+      <div class="header-right-group">
+        <!-- Sugerencias de dominios / notificaciones internas -->
+        <button class="notification-bell-btn" id="btnDomainNotifications" title="Sugerencias de dominios e IA">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notification-badge" id="domainNotificationBadge" style="display:none;">0</span>
+        </button>
+
+        <!-- 3. Selector de Tres Modos: Oscuro / Claro / Alto Contraste -->
+        <div class="header-mode-switcher" title="Cambiar modo de visualización">
+          <button class="mode-btn active" data-mode="dark" title="Modo Oscuro">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+          <button class="mode-btn" data-mode="light" title="Modo Claro">
+            <i class="fa-solid fa-sun"></i>
+          </button>
+          <button class="mode-btn" data-mode="high-contrast" title="Modo Alto Contraste">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+
+        <!-- 4. Dropdown Único Agrupando Todos los Botones de Acción -->
+        <div class="header-actions-dropdown-container">
+          <button class="actions-menu-btn" id="btnToggleActionsMenu">
+            <i class="fa-solid fa-bars-staggered"></i>
+            <span>Acciones</span>
+            <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
+          </button>
+
+          <div class="actions-dropdown-menu" id="actionsDropdownMenu">
+            <button class="action-menu-item" id="menuActionNewLink">
+              <i class="fa-solid fa-plus"></i> Guardar Enlace
+            </button>
+            <button class="action-menu-item" id="menuActionPaste">
+              <i class="fa-solid fa-paste"></i> Pegar del Portapapeles
+            </button>
+            <button class="action-menu-item" id="menuActionBatch">
+              <i class="fa-solid fa-layer-group"></i> Importar Pestañas
+            </button>
+            <button class="action-menu-item" id="menuActionLinkAssistant">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Asistente de Enlaces
+            </button>
+            <button class="action-menu-item" id="menuActionAnalytics">
+              <i class="fa-solid fa-chart-line"></i> Estadísticas & KPIs
+            </button>
+            <div class="action-menu-divider"></div>
+            <button class="action-menu-item" id="menuActionToggleDashboard">
+              <i class="fa-solid fa-chart-pie"></i> <span id="menuDashboardText">Ver Gráficas & KPIs</span>
+            </button>
+            <button class="action-menu-item" id="menuActionTrophies">
+              <i class="fa-solid fa-trophy"></i> Sala de Trofeos (<span id="menuTrophiesCount">0/26</span>)
+            </button>
+            <button class="action-menu-item" id="menuActionCyclicTip">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Consejo IA Ahora
+            </button>
+            <div class="action-menu-divider"></div>
+            <button class="action-menu-item" id="menuActionControlPanel" style="color: var(--primary);">
+              <i class="fa-solid fa-gear"></i> Panel de Control
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         SIDEBAR: ACORDEONES / DROPDOWNS PARA NO ACAPARAR ESPACIO
+         ============================================================ -->
+    <aside class="glass-sidebar">
+      <!-- Vistas Principales -->
+      <ul class="sidebar-nav">
+        <li class="nav-item active" data-filter="all">
+          <div class="nav-item-left">
+            <i class="fa-solid fa-border-all" style="width: 14px;"></i>
+            <span>Todos los Enlaces</span>
+          </div>
+          <span class="nav-badge" id="badgeAllCount">0</span>
+        </li>
+        <li class="nav-item" data-filter="favorites">
+          <div class="nav-item-left">
+            <i class="fa-solid fa-star" style="width: 14px; color: #fbbf24;"></i>
+            <span>Favoritos</span>
+          </div>
+          <span class="nav-badge" id="badgeFavCount">0</span>
+        </li>
+        <li class="nav-item" data-filter="unread">
+          <div class="nav-item-left">
+            <i class="fa-solid fa-clock" style="width: 14px; color: #38bdf8;"></i>
+            <span>Por Leer</span>
+          </div>
+          <span class="nav-badge" id="badgeUnreadCount">0</span>
+        </li>
+      </ul>
+
+      <!-- Acordeón 1: Perfiles de Usuario de Navegador -->
+      <div class="sidebar-accordion" id="accordionProfiles">
+        <div class="sidebar-accordion-header" id="toggleProfilesAccordion">
+          <div class="sidebar-accordion-title">
+            <i class="fa-solid fa-users-viewfinder"></i>
+            <span>Perfiles de Usuario</span>
+          </div>
+          <i class="fa-solid fa-chevron-down accordion-chevron"></i>
+        </div>
+        <div class="sidebar-accordion-body">
+          <ul class="sidebar-nav" id="sidebarProfilesList">
+            <!-- Populated dynamically -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Acordeón 2: Dominios agrupados -->
+      <div class="sidebar-accordion" id="accordionDomains">
+        <div class="sidebar-accordion-header" id="toggleDomainsAccordion">
+          <div class="sidebar-accordion-title">
+            <i class="fa-solid fa-globe"></i>
+            <span>Dominios</span>
+          </div>
+          <i class="fa-solid fa-chevron-down accordion-chevron"></i>
+        </div>
+        <div class="sidebar-accordion-body">
+          <ul class="sidebar-nav" id="sidebarDomainsList">
+            <!-- Populated dynamically -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Acordeón 3: Temas & Categorías -->
+      <div class="sidebar-accordion" id="accordionCategories">
+        <div class="sidebar-accordion-header" id="toggleCategoriesAccordion">
+          <div class="sidebar-accordion-title">
+            <i class="fa-solid fa-tags"></i>
+            <span>Temas & Categorías</span>
+          </div>
+          <i class="fa-solid fa-chevron-down accordion-chevron"></i>
+        </div>
+        <div class="sidebar-accordion-body">
+          <ul class="sidebar-nav" id="sidebarCategoriesList">
+            <!-- Populated dynamically -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- RAM Compact Widget -->
+      <div class="ram-compact-card">
+        <div>
+          <div class="ram-compact-label"><i class="fa-solid fa-microchip"></i> RAM Salvada</div>
+          <div class="ram-compact-val" id="sidebarRamVal">~1.4 GB</div>
+        </div>
+        <i class="fa-solid fa-shield-halved" style="color: var(--primary); font-size: 18px;"></i>
+      </div>
+    </aside>
+
+    <!-- ============================================================
+         MAIN WORKSPACE
+         ============================================================ -->
+    <main class="main-workspace">
+      <!-- AI Dynamic Cyclic Tip Banner -->
+      <div class="ai-tip-banner" id="aiTipBanner">
+        <div class="ai-tip-content">
+          <i class="fa-solid fa-brain" style="color: var(--primary); font-size: 15px;"></i>
+          <span id="aiTipText">Cargando consejo dinámico antitab...</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="ai-tip-source" id="aiTipSource">Ollama / AI</span>
+          <button class="icon-action-btn" id="btnRefreshTip" title="Generar nuevo aviso">
+            <i class="fa-solid fa-rotate"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dashboard de Indicadores & Gráficas (Toggleable) -->
+      <section class="dashboard-section" id="dashboardSection">
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Rango & Nivel</span>
+              <span class="metric-value" id="kpiLevelVal">Nivel 1</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Pestañas Salvadas</span>
+              <span class="metric-value" id="kpiTabsVal">0</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(6, 182, 212, 0.15); color: #22d3ee;">
+              <i class="fa-solid fa-microchip"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">RAM Liberada</span>
+              <span class="metric-value" id="kpiRamVal">~1.4 GB</span>
+            </div>
+          </div>
+          <div class="metric-card" style="cursor: pointer;" id="kpiTrophiesCard">
+            <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Trofeos Consola</span>
+              <span class="metric-value" id="kpiTrophiesVal">0 / 26</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">
+              <i class="fa-solid fa-chart-pie" style="margin-right: 6px; color: var(--primary);"></i> Distribución por Temas
+            </div>
+            <div class="chart-canvas-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">
+              <i class="fa-solid fa-chart-bar" style="margin-right: 6px; color: #38bdf8;"></i> Enlaces por Perfil
+            </div>
+            <div class="chart-canvas-container">
+              <canvas id="profileChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           VISTA DETALLADA DE DOMINIO
+           ============================================================ -->
+      <section class="detail-view" id="domainDetailView" style="display:none;">
+        <div class="detail-view-header">
+          <div class="detail-view-title">
+            <button type="button" class="icon-action-btn" id="btnDomainDetailBack" title="Volver">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div>
+              <h2><i class="fa-solid fa-globe" style="color: var(--primary);"></i> <span id="domainDetailName">Dominio</span></h2>
+              <span id="domainDetailSubtitle">Detalle del dominio</span>
+            </div>
+          </div>
+          <div class="detail-view-actions">
+            <button type="button" class="glass-btn btn-compact" id="btnDomainDetailAddLink">
+              <i class="fa-solid fa-plus"></i> Añadir enlace
+            </button>
+            <button type="button" class="glass-btn btn-compact" id="btnDomainDetailOpenAll">
+              <i class="fa-solid fa-up-right-from-square"></i> Abrir todos
+            </button>
+            <button type="button" class="glass-btn btn-compact" id="btnDomainDetailMerge">
+              <i class="fa-solid fa-object-group"></i> Fusionar
+            </button>
+            <button type="button" class="glass-btn glass-btn-secondary btn-compact" id="btnDomainDetailSuggest">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Analizar
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-kpis" id="domainDetailKpis"></div>
+
+        <div class="detail-charts-grid">
+          <div class="chart-card">
+            <div class="mini-chart-title"><i class="fa-solid fa-tags"></i> Temas dentro del dominio</div>
+            <div class="chart-canvas-container"><canvas id="domainDetailCategoryChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="mini-chart-title"><i class="fa-solid fa-users"></i> Perfiles dentro del dominio</div>
+            <div class="chart-canvas-container"><canvas id="domainDetailProfileChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="detail-links-head">
+          <h3>Enlaces del dominio</h3>
+          <span id="domainDetailLinkCount">0 enlaces</span>
+        </div>
+        <div class="links-grid" id="domainDetailLinks"></div>
+      </section>
+
+      <!-- ============================================================
+           SECCIÓN DE ESTADÍSTICAS, KPIs Y ANÁLISIS LOCAL
+           ============================================================ -->
+      <section class="analytics-view" id="analyticsView" style="display:none;">
+        <div class="detail-view-header">
+          <div class="detail-view-title">
+            <button type="button" class="icon-action-btn" id="btnAnalyticsBack" title="Volver">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div>
+              <h2><i class="fa-solid fa-chart-line" style="color: var(--primary);"></i> Estadísticas & KPIs</h2>
+              <span>Medición local de todo el sistema · datos descriptivos y análisis con IA</span>
+            </div>
+          </div>
+          <div class="detail-view-actions">
+            <button type="button" class="glass-btn btn-compact" id="btnAnalyticsMode">
+              <i class="fa-solid fa-user-graduate"></i> Modo principiante
+            </button>
+            <button type="button" class="glass-btn btn-compact" id="btnAnalyticsRefresh">
+              <i class="fa-solid fa-rotate"></i> Actualizar
+            </button>
+            <button type="button" class="glass-btn btn-compact" id="btnAnalyticsExport">
+              <i class="fa-solid fa-download"></i> Exportar JSON
+            </button>
+          </div>
+        </div>
+
+        <div class="analytics-kpis" id="analyticsKpis"></div>
+
+        <div class="analytics-insight-card">
+          <div class="analytics-insight-head">
+            <div><i class="fa-solid fa-brain"></i> Lectura inteligente de tus datos</div>
+            <button type="button" class="glass-btn glass-btn-secondary btn-compact" id="btnAnalyticsAI">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Generar análisis con Ollama
+            </button>
+          </div>
+          <div class="analytics-insights" id="analyticsInsights">
+            <div class="db-empty">Genera un análisis para obtener conclusiones y recomendaciones.</div>
+          </div>
+          <div class="analytics-source" id="analyticsInsightSource"></div>
+        </div>
+
+        <div class="analytics-charts-grid">
+          <div class="chart-card">
+            <div class="mini-chart-title"><i class="fa-solid fa-chart-line"></i> Enlaces añadidos (30 días)</div>
+            <div class="chart-canvas-container tall"><canvas id="analyticsLinksChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="mini-chart-title"><i class="fa-solid fa-chart-pie"></i> Distribución por tema</div>
+            <div class="chart-canvas-container tall"><canvas id="analyticsCategoryChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="mini-chart-title"><i class="fa-solid fa-chart-bar"></i> Top dominios</div>
+            <div id="analyticsDomainsChart" class="highcharts-box"></div>
+          </div>
+          <div class="chart-card">
+            <div class="mini-chart-title"><i class="fa-solid fa-fire"></i> Actividad por hora</div>
+            <div id="analyticsHeatmapChart" class="highcharts-box"></div>
+          </div>
+          <div class="chart-card advanced-only">
+            <div class="mini-chart-title"><i class="fa-solid fa-sitemap"></i> Mapa jerárquico de dominios y temas</div>
+            <div id="analyticsTreemapChart" class="plotly-box"></div>
+          </div>
+          <div class="chart-card advanced-only">
+            <div class="mini-chart-title"><i class="fa-solid fa-braille"></i> Relación visitas · etiquetas</div>
+            <div id="analyticsScatterChart" class="plotly-box"></div>
+          </div>
+        </div>
+
+        <div class="analytics-two-col">
+          <div class="analytics-panel">
+            <h3><i class="fa-solid fa-calculator"></i> Estadística descriptiva</h3>
+            <div class="analytics-table-wrap" id="analyticsDescriptiveTable"></div>
+          </div>
+          <div class="analytics-panel">
+            <h3><i class="fa-solid fa-shield-halved"></i> Calidad de datos</h3>
+            <div id="analyticsQuality" class="analytics-quality-grid"></div>
+          </div>
+        </div>
+
+        <div class="analytics-panel advanced-only">
+          <h3><i class="fa-solid fa-list-check"></i> Eventos y rendimiento de la API</h3>
+          <div id="analyticsEventsTable" class="analytics-table-wrap"></div>
+        </div>
+      </section>
+
+      <!-- Search & Controls Bar -->
+      <section class="controls-bar">
+        <div class="search-box-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="searchInput" class="search-input" placeholder="Buscar enlaces por título, URL, tema o etiqueta...">
+        </div>
+
+        <div class="filter-chips">
+          <button class="filter-chip active" data-chip="all">Todos</button>
+          <button class="filter-chip" data-chip="favorites"><i class="fa-solid fa-star"></i> Destacados</button>
+          <button class="filter-chip" data-chip="unread"><i class="fa-solid fa-clock"></i> Pendientes</button>
+          <button class="filter-chip" id="btnToggleDomainGrouping"><i class="fa-solid fa-layer-group"></i> Agrupar por dominio</button>
+        </div>
+      </section>
+
+      <!-- Active Filter Banner -->
+      <div id="activeFilterNotice" style="display: none; align-items: center; justify-content: space-between; background: var(--accent-subtle); border: 1px solid var(--primary); padding: 7px 14px; border-radius: 8px; font-size: 12px;">
+        <span id="activeFilterText">Filtrando por...</span>
+        <button id="btnClearFilter" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 12px; font-weight: 700;">
+          <i class="fa-solid fa-xmark"></i> Quitar filtro
+        </button>
+      </div>
+
+      <!-- Links Grid View (Zero-Flicker in-place updates) -->
+      <section class="links-grid" id="linksGrid">
+        <!-- Rendered dynamically -->
+      </section>
+    </main>
+  </div>
+
+  <!-- ============================================================
+       MODAL 1: DETALLE DE NIVEL & FESTEJOS DE RANGO
+       ============================================================ -->
+  <div class="modal-overlay" id="levelDetailModal">
+    <div class="glass-modal" style="max-width: 520px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-crown" style="color: #fbbf24;"></i> Tu Rango & Nivel Antitab</h2>
+        <button class="close-modal-btn" id="btnCloseLevelModal">&times;</button>
+      </div>
+
+      <div class="level-detail-hero">
+        <div class="level-emblem-large animate__animated animate__pulse animate__infinite">
+          <i class="fa-solid fa-medal"></i>
+        </div>
+        <div style="font-size: 20px; font-weight: 800; color: var(--text-bright);" id="modalLevelNumber">NIVEL 1</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--primary);" id="modalLevelTitle">Acumulador en Terapia</div>
+        
+        <div style="width: 100%; margin-top: 10px;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px;">
+            <span>Progreso de XP</span>
+            <span id="modalXpText">80 / 120 XP</span>
+          </div>
+          <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;">
+            <div id="modalXpFill" style="height: 100%; background: var(--accent-gradient); width: 66%; transition: width 0.4s ease;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+        <div style="background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);">
+          <div style="color: var(--text-muted); font-size: 10px; font-weight: 700;">PUNTOS XP TOTALES</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-bright); margin-top: 2px;" id="modalTotalXp">80 XP</div>
+        </div>
+        <div style="background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);">
+          <div style="color: var(--text-muted); font-size: 10px; font-weight: 700;">TROFEOS GANADOS</div>
+          <div style="font-size: 16px; font-weight: 800; color: #fbbf24; margin-top: 2px;" id="modalTrophiesRatio">0 / 26</div>
+        </div>
+        <div style="background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);">
+          <div style="color: var(--text-muted); font-size: 10px; font-weight: 700;">PESTAÑAS ELIMINADAS</div>
+          <div style="font-size: 16px; font-weight: 800; color: #34d399; margin-top: 2px;" id="modalTabsClosed">0</div>
+        </div>
+        <div style="background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);">
+          <div style="color: var(--text-muted); font-size: 10px; font-weight: 700;">ENLACES PODADOS</div>
+          <div style="font-size: 16px; font-weight: 800; color: #38bdf8; margin-top: 2px;" id="modalPrunedLinks">0</div>
+        </div>
+      </div>
+
+      <div style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 10px; border-radius: 8px;">
+        <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i> <strong>Advertencia de Inactividad:</strong> Si pasas más de 24 horas sin interactuar o limpiar enlaces, tu XP empezará a decaer. ¡Mantén tu navegador activo y libre de pestañas!
+      </div>
+
+      <button class="glass-btn glass-btn-primary" id="btnCelebrateLevel" style="justify-content: center; width: 100%;">
+        <i class="fa-solid fa-champagne-glasses"></i> ¡Celebrar Rango con Confeti!
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 2: PANEL DE CONTROL "DE OTRO MUNDO"
+       4 Pestañas: 1. Temas  2. Perfiles  3. Categorías  4. Ollama AI
+       ============================================================ -->
+  <div class="modal-overlay" id="controlPanelModal">
+    <div class="glass-modal" style="max-width: 720px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Panel de Control & Configuración</h2>
+        <button class="close-modal-btn" id="btnCloseControlPanel">&times;</button>
+      </div>
+
+      <!-- Control Panel Tabs -->
+      <div class="control-panel-tabs">
+        <button class="cp-tab-btn active" data-cptab="themes">
+          <i class="fa-solid fa-palette"></i> 10 Temas
+        </button>
+        <button class="cp-tab-btn" data-cptab="profiles">
+          <i class="fa-solid fa-users"></i> Gestor de Perfiles
+        </button>
+        <button class="cp-tab-btn" data-cptab="categories">
+          <i class="fa-solid fa-tags"></i> Gestor de Temas
+        </button>
+        <button class="cp-tab-btn" data-cptab="ollama">
+          <i class="fa-solid fa-brain"></i> Ollama AI Local
+        </button>
+        <button class="cp-tab-btn" data-cptab="database">
+          <i class="fa-solid fa-database"></i> Base de Datos
+        </button>
+      </div>
+
+      <!-- Tab Content 1: 10 Color Themes -->
+      <div class="cp-tab-content active" id="cpTabThemes">
+        <div style="font-size: 12px; color: var(--text-secondary);">
+          Escoge tu paleta de color favorita. El tema se almacena de forma persistente y se adapta automáticamente a tu modo (Claro, Oscuro o Alto Contraste).
+        </div>
+        <div class="themes-selector-grid" id="themesSelectorGrid">
+          <!-- Populated dynamically via JS with 10 themes -->
+        </div>
+      </div>
+
+      <!-- Tab Content 2: Profiles Manager -->
+      <div class="cp-tab-content" id="cpTabProfiles">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; color: var(--text-secondary);">Edita, personaliza o elimina los perfiles de tu navegador.</span>
+          <button class="glass-btn glass-btn-primary" id="btnCpNewProfile" style="padding: 5px 12px; font-size: 11.5px;">
+            <i class="fa-solid fa-plus"></i> Nuevo Perfil
+          </button>
+        </div>
+        <div class="cp-items-list" id="cpProfilesList"></div>
+      </div>
+
+      <!-- Tab Content 3: Categories Manager -->
+      <div class="cp-tab-content" id="cpTabCategories">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; color: var(--text-secondary);">Gestiona los temas y categorías semánticas de enlaces.</span>
+          <button class="glass-btn glass-btn-primary" id="btnCpNewCategory" style="padding: 5px 12px; font-size: 11.5px;">
+            <i class="fa-solid fa-plus"></i> Nuevo Tema
+          </button>
+        </div>
+        <div class="cp-items-list" id="cpCategoriesList"></div>
+      </div>
+
+      <!-- Tab Content 4: Ollama AI Local Integration -->
+      <div class="cp-tab-content" id="cpTabOllama">
+        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+          Configura la conexión con <strong>Ollama LLM local</strong> para recibir avisos y consejos dinámicos cíclicos generados por IA, garantizando que jamás sean mensajes estáticos.
+        </div>
+
+        <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; font-weight: 700;">Estado de Ollama en tu Sistema:</span>
+            <span id="ollamaStatusBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 999px; background: rgba(239, 68, 68, 0.2); color: #ef4444; font-weight: 700;">Comprobando...</span>
+          </div>
+
+          <div style="font-size: 11px; color: var(--text-muted);" id="ollamaPathInfo">
+            Buscando binario en sistema...
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="glass-btn glass-btn-secondary" id="btnStartOllama" style="padding: 6px 12px; font-size: 12px;">
+              <i class="fa-solid fa-play"></i> Iniciar Servidor Ollama
+            </button>
+            <button class="glass-btn" id="btnTestOllamaTip" style="padding: 6px 12px; font-size: 12px;">
+              <i class="fa-solid fa-sparkles"></i> Probar Generación Ahora
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ollamaHostInput">Host / URL de Ollama:</label>
+            <input type="text" id="ollamaHostInput" class="form-control" value="http://127.0.0.1:11434">
+          </div>
+          <div class="form-group">
+            <label for="ollamaModelSelect">Modelo LLM Activo:</label>
+            <select id="ollamaModelSelect" class="form-control">
+              <option value="">Detectando modelos...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ollamaIntervalSelect">Frecuencia de Avisos Cíclicos:</label>
+          <select id="ollamaIntervalSelect" class="form-control">
+            <option value="2">Cada 2 minutos</option>
+            <option value="5" selected>Cada 5 minutos</option>
+            <option value="10">Cada 10 minutos</option>
+            <option value="0">Desactivado (Solo bajo demanda)</option>
+          </select>
+        </div>
+
+        <!-- Domain grouping + LLM watcher settings -->
+        <div class="domain-settings-card">
+          <div class="domain-settings-title">
+            <i class="fa-solid fa-globe"></i> Agrupación por dominio & sugerencias IA
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+            Ollama revisa los grupos de enlaces y propone fusiones o miniaturas.
+            Nada se aplica sin tu confirmación.
+          </div>
+
+          <label class="domain-check-row">
+            <input type="checkbox" id="domainGroupSubdomains" checked>
+            <span>Agrupar subdominios en el dominio principal</span>
+          </label>
+          <label class="domain-check-row">
+            <input type="checkbox" id="domainScanEnabled" checked>
+            <span>Análisis automático de dominios</span>
+          </label>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="domainScanInterval">Frecuencia de análisis:</label>
+              <select id="domainScanInterval" class="form-control">
+                <option value="5">Cada 5 minutos</option>
+                <option value="10" selected>Cada 10 minutos</option>
+                <option value="30">Cada 30 minutos</option>
+                <option value="60">Cada 60 minutos</option>
+                <option value="0">Desactivado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="domainMinConfidence">Confianza mínima:</label>
+              <select id="domainMinConfidence" class="form-control">
+                <option value="0.4">Baja (0.4)</option>
+                <option value="0.5">Media-baja (0.5)</option>
+                <option value="0.6" selected>Media (0.6)</option>
+                <option value="0.7">Alta (0.7)</option>
+                <option value="0.8">Muy alta (0.8)</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="domain-check-row">
+            <input type="checkbox" id="domainToastEnabled" checked>
+            <span>Mostrar toast para sugerencias importantes</span>
+          </label>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wordcloudRotation">Rotación de la nube de palabras:</label>
+              <select id="wordcloudRotation" class="form-control">
+                <option value="30">Cada 30 segundos</option>
+                <option value="60" selected>Cada 60 segundos</option>
+                <option value="120">Cada 2 minutos</option>
+                <option value="300">Cada 5 minutos</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="analyticsRetentionDays">Retención de métricas:</label>
+              <select id="analyticsRetentionDays" class="form-control">
+                <option value="30">30 días</option>
+                <option value="90" selected>90 días</option>
+                <option value="180">180 días</option>
+                <option value="365">1 año</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="domain-settings-actions">
+            <button type="button" class="glass-btn glass-btn-secondary btn-compact" id="btnDomainSettingsScan">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Analizar ahora
+            </button>
+            <button type="button" class="glass-btn btn-compact" id="btnDomainSettingsUndo">
+              <i class="fa-solid fa-rotate-left"></i> Deshacer última acción
+            </button>
+          </div>
+          <div class="domain-settings-status" id="domainSettingsStatus">
+            Cargando configuración...
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 5: Database Export / Import / Backups -->
+      <div class="cp-tab-content" id="cpTabDatabase">
+        <div class="db-info-card" id="dbInfoCard">
+          <div class="db-info-row">
+            <span><i class="fa-solid fa-location-dot"></i> Ubicación de datos</span>
+            <code id="dbPathText">Cargando...</code>
+          </div>
+          <div class="db-info-grid">
+            <div><span>Enlaces</span><strong id="dbInfoLinks">-</strong></div>
+            <div><span>Cuentas</span><strong id="dbInfoCredentials">-</strong></div>
+            <div><span>Sub-enlaces</span><strong id="dbInfoSublinks">-</strong></div>
+            <div><span>Tamaño</span><strong id="dbInfoSize">-</strong></div>
+            <div><span>Última modificación</span><strong id="dbInfoModified">-</strong></div>
+            <div><span>Copias guardadas</span><strong id="dbInfoBackups">-</strong></div>
+          </div>
+        </div>
+
+        <div class="db-section-title">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i> Exportar / Importar
+        </div>
+        <div class="db-actions-grid">
+          <button class="glass-btn glass-btn-primary" id="btnExportDb">
+            <i class="fa-solid fa-download"></i> Exportar base de datos (.db)
+          </button>
+          <button class="glass-btn glass-btn-secondary" id="btnExportJson">
+            <i class="fa-solid fa-file-code"></i> Exportar respaldo portable (.json)
+          </button>
+          <button class="glass-btn" id="btnImportDb">
+            <i class="fa-solid fa-upload"></i> Importar base de datos (.db)
+          </button>
+          <button class="glass-btn" id="btnImportJson">
+            <i class="fa-solid fa-file-import"></i> Importar respaldo (.json)
+          </button>
+          <button class="glass-btn" id="btnCreateBackup">
+            <i class="fa-solid fa-shield-halved"></i> Crear copia de seguridad ahora
+          </button>
+        </div>
+        <input type="file" id="importDbFile" accept=".db,.sqlite,.sqlite3" style="display:none;">
+        <input type="file" id="importJsonFile" accept=".json,application/json" style="display:none;">
+
+        <div class="db-section-title" style="margin-top: 4px;">
+          <i class="fa-solid fa-clock-rotate-left"></i> Copias automáticas recientes
+          <button class="icon-action-btn" id="btnRefreshBackups" title="Actualizar lista">
+            <i class="fa-solid fa-rotate"></i>
+          </button>
+        </div>
+        <div class="auto-backups-list" id="autoBackupsList">
+          <div class="db-empty">Cargando copias de seguridad...</div>
+        </div>
+
+        <div class="db-note">
+          <i class="fa-solid fa-shield-halved"></i>
+          Los datos viven en <strong>%APPDATA%\Pageneitor</strong>, fuera de la carpeta del
+          ejecutable. Recompilar nunca borra tus enlaces, cuentas ni copias de seguridad.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 3: SALA DE TROFEOS EXTENDIDA (26+ TROFEOS)
+       ============================================================ -->
+  <div class="modal-overlay" id="trophiesModal">
+    <div class="glass-modal" style="max-width: 780px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-trophy" style="color: #fbbf24;"></i> Sala de Trofeos & Logros de Consola</h2>
+        <button class="close-modal-btn" id="btnCloseTrophiesModal">&times;</button>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-secondary);">
+        <span>Trofeos por perfiles, categorías, poda y enlaces perfectos.</span>
+        <span id="trophyCompletionBadge" style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; padding: 3px 10px; border-radius: 12px; font-weight: 700;">
+          0 / 26 Desbloqueados
+        </span>
+      </div>
+
+      <div class="trophies-grid" id="trophiesGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: SUGERENCIAS DE DOMINIOS / NOTIFICACIONES INTERNAS
+       ============================================================ -->
+  <div class="modal-overlay" id="domainNotificationsModal">
+    <div class="glass-modal" style="max-width: 760px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-bell" style="color: #fbbf24;"></i> Sugerencias de dominios</h2>
+        <button class="close-modal-btn" id="btnCloseDomainNotifications">&times;</button>
+      </div>
+
+      <div class="domain-notif-toolbar">
+        <div class="domain-notif-summary" id="domainNotifSummary">Cargando sugerencias...</div>
+        <div class="domain-notif-toolbar-actions">
+          <button type="button" class="glass-btn btn-compact" id="btnDomainNotifScan">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Analizar ahora
+          </button>
+          <button type="button" class="glass-btn btn-compact" id="btnDomainNotifUndo">
+            <i class="fa-solid fa-rotate-left"></i> Deshacer
+          </button>
+          <button type="button" class="glass-btn btn-compact" id="btnDomainNotifReadAll">
+            <i class="fa-solid fa-check-double"></i> Marcar leídas
+          </button>
+        </div>
+      </div>
+
+      <div class="domain-notifications-list" id="domainNotificationsList">
+        <div class="db-empty">Cargando...</div>
+      </div>
+
+      <div class="db-note">
+        <i class="fa-solid fa-shield-halved"></i>
+        Ninguna sugerencia se aplica sola. Al confirmar, Pageneitor crea una copia
+        de seguridad antes de modificar la base de datos y puedes deshacer el cambio.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 4: GUARDAR / EDITAR ENLACE
+       ============================================================ -->
+  <div class="modal-overlay" id="linkModal">
+    <div class="glass-modal">
+      <div class="modal-header">
+        <h2 id="modalTitle"><i class="fa-solid fa-link" style="color: var(--primary);"></i> Guardar Enlace</h2>
+        <button class="close-modal-btn" id="btnCloseLinkModal">&times;</button>
+      </div>
+
+      <form id="linkForm" style="display: flex; flex-direction: column; gap: 12px;">
+        <input type="hidden" id="editLinkId">
+
+        <div class="form-group">
+          <label for="inputUrl">URL de la página web *</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="url" id="inputUrl" class="form-control" placeholder="https://ejemplo.com/recurso" required style="flex: 1;">
+            <button type="button" id="btnScrapeNow" class="glass-btn glass-btn-secondary" style="padding: 0 12px; font-size: 11.5px;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Detectar
+            </button>
+          </div>
+        </div>
+
+        <div class="live-scrape-preview" id="liveScrapePreview">
+          <img id="scrapePreviewImg" class="scrape-preview-thumb" src="" alt="Miniatura">
+          <div class="scrape-preview-info">
+            <div class="scrape-preview-title" id="scrapePreviewTitle">Título</div>
+            <div class="scrape-preview-desc" id="scrapePreviewDesc">Descripción</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputTitle">Título *</label>
+          <input type="text" id="inputTitle" class="form-control" placeholder="Nombre descriptivo" required>
+        </div>
+
+        <div class="form-group">
+          <label for="inputDesc">Descripción / Resumen</label>
+          <textarea id="inputDesc" class="form-control" placeholder="¿De qué trata este recurso?"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="selectProfile">Perfil de Usuario</label>
+            <select id="selectProfile" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label for="selectCategory">Tema / Categoría</label>
+            <select id="selectCategory" class="form-control"></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputThumbnail">URL de Miniatura (Opcional)</label>
+          <input type="url" id="inputThumbnail" class="form-control" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label for="inputTags">Etiquetas (separadas por comas)</label>
+          <input type="text" id="inputTags" class="form-control" placeholder="ej. css, react, ia">
+        </div>
+
+        <div class="form-group">
+          <label for="inputNotes">Notas Personales (Opcional - Requerido para trofeo perfecto)</label>
+          <input type="text" id="inputNotes" class="form-control" placeholder="Apuntes o tareas pendientes con este enlace">
+        </div>
+
+        <!-- Multi-account credentials directly in the link form -->
+        <div class="form-group">
+          <div class="form-section-header">
+            <label><i class="fa-solid fa-key" style="color: var(--primary);"></i> Cuentas / Credenciales de la página</label>
+            <button type="button" class="glass-btn glass-btn-secondary btn-compact" id="btnAddFormCredential">
+              <i class="fa-solid fa-plus"></i> Añadir cuenta
+            </button>
+          </div>
+          <div class="form-credentials-list" id="formCredentialsList">
+            <div class="form-credentials-empty">Puedes guardar varias cuentas para el mismo sitio (usuario, contraseña y notas).</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+          <button type="button" class="glass-btn" id="btnCancelLink">Cancelar</button>
+          <button type="submit" class="glass-btn glass-btn-primary" id="btnSubmitLink">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Enlace
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 4B: CAJA FUERTE DE CREDENCIALES (MÚLTIPLES CUENTAS)
+       ============================================================ -->
+  <div class="modal-overlay" id="credentialsModal">
+    <div class="glass-modal" style="max-width: 650px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-key" style="color: #fbbf24;"></i> Credenciales de la página</h2>
+        <button class="close-modal-btn" id="btnCloseCredentialsModal">&times;</button>
+      </div>
+
+      <div class="cred-modal-link" id="credModalLinkInfo">
+        <i class="fa-solid fa-link"></i>
+        <div>
+          <strong id="credModalLinkTitle">Enlace</strong>
+          <span id="credModalLinkUrl">https://...</span>
+        </div>
+      </div>
+
+      <div class="cred-list" id="credentialsList">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <form id="credentialForm" class="credential-form">
+        <input type="hidden" id="credEditId">
+        <div class="cred-form-title" id="credFormTitle">
+          <i class="fa-solid fa-plus"></i> Añadir una cuenta
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="credLabel">Etiqueta / Alias</label>
+            <input type="text" id="credLabel" class="form-control" placeholder="ej. Personal, Trabajo, Admin">
+          </div>
+          <div class="form-group">
+            <label for="credUsername">Usuario / Correo</label>
+            <input type="text" id="credUsername" class="form-control" placeholder="usuario@correo.com" autocomplete="off">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="credPassword">Contraseña</label>
+            <div class="password-input-wrap">
+              <input type="password" id="credPassword" class="form-control" placeholder="Contraseña" autocomplete="new-password">
+              <button type="button" class="icon-action-btn" id="btnToggleCredPassword" title="Mostrar/ocultar">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="credNotes">Notas (opcional)</label>
+            <input type="text" id="credNotes" class="form-control" placeholder="Pregunta secreta, plan, etc.">
+          </div>
+        </div>
+        <div class="cred-form-actions">
+          <button type="button" class="glass-btn" id="btnCancelCredentialEdit" style="display:none;">Cancelar edición</button>
+          <button type="submit" class="glass-btn glass-btn-primary" id="btnSaveCredential">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar cuenta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 4C: SUB-ENLACES / PESTAÑAS DEL MISMO SITIO
+       ============================================================ -->
+  <div class="modal-overlay" id="sublinksModal">
+    <div class="glass-modal" style="max-width: 720px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-folder-tree" style="color: var(--primary);"></i> Sub-enlaces del sitio</h2>
+        <button class="close-modal-btn" id="btnCloseSublinksModal">&times;</button>
+      </div>
+
+      <div class="cred-modal-link" id="subModalLinkInfo">
+        <i class="fa-solid fa-globe"></i>
+        <div>
+          <strong id="subModalLinkTitle">Enlace</strong>
+          <span id="subModalLinkUrl">https://...</span>
+        </div>
+        <button class="glass-btn glass-btn-secondary btn-compact" id="btnOpenAllSublinks">
+          <i class="fa-solid fa-up-right-from-square"></i> Abrir todos
+        </button>
+      </div>
+
+      <div class="sublink-suggestions" id="sublinkSuggestions"></div>
+
+      <div class="sublink-list" id="sublinksList">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <form id="sublinkForm" class="credential-form">
+        <div class="cred-form-title">
+          <i class="fa-solid fa-plus"></i> Añadir otro enlace de esta misma página
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="subTitle">Título (opcional)</label>
+            <input type="text" id="subTitle" class="form-control" placeholder="ej. Documentación, Panel de admin">
+          </div>
+          <div class="form-group">
+            <label for="subUrl">URL *</label>
+            <input type="url" id="subUrl" class="form-control" placeholder="https://misma-pagina.com/ruta" required>
+          </div>
+        </div>
+        <div class="cred-form-actions">
+          <button type="submit" class="glass-btn glass-btn-primary" id="btnAddSublink">
+            <i class="fa-solid fa-plus"></i> Añadir sub-enlace
+          </button>
+        </div>
+      </form>
+
+      <details class="batch-sublinks-box">
+        <summary><i class="fa-solid fa-layer-group"></i> Pegar varios enlaces a la vez</summary>
+        <textarea id="batchSublinksText" class="form-control" style="min-height: 95px; font-family: monospace; font-size: 12px;" placeholder="https://misma-pagina.com/a&#10;https://misma-pagina.com/b"></textarea>
+        <button type="button" class="glass-btn glass-btn-secondary" id="btnBatchAddSublinks" style="align-self: flex-start;">
+          <i class="fa-solid fa-bolt"></i> Añadir todos
+        </button>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: ASISTENTE DE INSERCIÓN DE ENLACES
+       ============================================================ -->
+  <div class="modal-overlay" id="linkAssistantModal">
+    <div class="glass-modal" style="max-width: 820px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Asistente de Enlaces</h2>
+        <button class="close-modal-btn" id="btnCloseLinkAssistant">&times;</button>
+      </div>
+
+      <div class="assistant-intro">
+        Pega una o varias URLs. El asistente detectará el dominio, comprobará duplicados,
+        clasificará cada enlace y propondrá temas, perfiles y etiquetas. No se guardará
+        nada hasta que confirmes.
+      </div>
+
+      <div class="form-group">
+        <label for="linkAssistantText">URLs (una por línea o separadas por espacios)</label>
+        <textarea id="linkAssistantText" class="form-control" style="min-height:110px;font-family:monospace;font-size:12px;" placeholder="https://github.com/...&#10;https://www.highcharts.com/&#10;https://plotly.com/javascript/"></textarea>
+      </div>
+
+      <div class="assistant-toolbar">
+        <button type="button" class="glass-btn glass-btn-primary" id="btnLinkAssistantAnalyze">
+          <i class="fa-solid fa-magnifying-glass-chart"></i> Analizar enlaces
+        </button>
+        <span class="assistant-status" id="linkAssistantStatus"></span>
+      </div>
+
+      <div class="assistant-options">
+        <label class="domain-check-row">
+          <input type="checkbox" id="chkAcceptNewCategories" checked>
+          <span>Crear temas nuevos si Ollama los recomienda</span>
+        </label>
+        <label class="domain-check-row">
+          <input type="checkbox" id="chkAcceptNewProfiles" checked>
+          <span>Crear perfiles nuevos si Ollama los recomienda</span>
+        </label>
+        <label class="domain-check-row">
+          <input type="checkbox" id="chkSkipDuplicates" checked>
+          <span>Omitir enlaces duplicados</span>
+        </label>
+      </div>
+
+      <div class="assistant-results" id="linkAssistantResults">
+        <div class="db-empty">Las propuestas aparecerán aquí.</div>
+      </div>
+
+      <div class="assistant-footer">
+        <button type="button" class="glass-btn" id="btnCancelLinkAssistant">Cancelar</button>
+        <button type="button" class="glass-btn glass-btn-primary" id="btnLinkAssistantSave" disabled>
+          <i class="fa-solid fa-floppy-disk"></i> Guardar enlaces confirmados
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 5: IMPORTACIÓN MASIVA DE PESTAÑAS
+       ============================================================ -->
+  <div class="modal-overlay" id="batchModal">
+    <div class="glass-modal">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-layer-group" style="color: var(--primary);"></i> Importar Pestañas en Masa</h2>
+        <button class="close-modal-btn" id="btnCloseBatchModal">&times;</button>
+      </div>
+
+      <div style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.4;">
+        Pega la lista de enlaces de todas las pestañas abiertas en tu navegador para guardarlas en bloque, ganar XP y cerrar el navegador de inmediato.
+      </div>
+
+      <div class="form-group">
+        <label for="batchTextarea">Lista de URLs (un enlace por línea):</label>
+        <textarea id="batchTextarea" class="form-control" style="min-height: 130px; font-family: monospace; font-size: 12px;" placeholder="https://github.com/...&#10;https://notion.so/..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="batchSelectProfile">Asignar al Perfil:</label>
+          <select id="batchSelectProfile" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label for="batchSelectCategory">Categoría por Defecto:</label>
+          <select id="batchSelectCategory" class="form-control"></select>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+        <button type="button" class="glass-btn" id="btnCancelBatch">Cancelar</button>
+        <button type="button" class="glass-btn glass-btn-primary" id="btnConfirmBatch">
+          <i class="fa-solid fa-bolt"></i> Procesar & Vaciar Navegador
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ASISTENTE FLOTANTE PERSISTENTE (OLLAMA + BÚSQUEDA LOCAL)
+       ============================================================ -->
+  <button class="chat-fab" id="chatFab" title="Abrir asistente Pageneitor">
+    <i class="fa-solid fa-comments"></i>
+    <span class="chat-fab-dot" id="chatFabDot"></span>
+  </button>
+
+  <section class="chat-panel" id="chatPanel" aria-hidden="true">
+    <header class="chat-header">
+      <div class="chat-header-brand">
+        <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
+        <div class="chat-header-text">
+          <h3>Asistente Pageneitor</h3>
+          <span class="chat-engine-badge" id="chatEngineBadge">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Conectando...
+          </span>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button type="button" id="btnChatNew" title="Nueva conversación">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <button type="button" id="btnChatHistory" title="Historial de conversaciones">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>
+        <button type="button" id="btnChatClose" title="Cerrar asistente">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="chat-history-drawer" id="chatHistoryDrawer">
+      <div class="chat-history-head">
+        <span><i class="fa-solid fa-clock-rotate-left"></i> Conversaciones guardadas</span>
+        <button type="button" id="btnCloseChatHistory" title="Cerrar historial">
+          <i class="fa-solid fa-chevron-up"></i>
+        </button>
+      </div>
+      <div class="chat-session-list" id="chatSessionList">
+        <div class="chat-history-empty">Aún no hay conversaciones.</div>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-welcome">
+        <div class="chat-welcome-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div class="chat-welcome-title">Tu asistente de enlaces</div>
+        <p>Puedo buscar en tu banco, mostrarte temas, perfiles y abrir enlaces por ti.</p>
+      </div>
+    </div>
+
+    <div class="chat-suggestions" id="chatSuggestions">
+      <button type="button" class="chat-chip" data-chat-suggestion="Ver categorías">Ver categorías</button>
+      <button type="button" class="chat-chip" data-chat-suggestion="Ver perfiles">Ver perfiles</button>
+      <button type="button" class="chat-chip" data-chat-suggestion="Ver dominios">Ver dominios</button>
+      <button type="button" class="chat-chip" data-chat-suggestion="Ver sugerencias">Ver sugerencias</button>
+      <button type="button" class="chat-chip" data-chat-suggestion="Resumen de mi banco">Resumen</button>
+      <button type="button" class="chat-chip" data-chat-suggestion="Enlaces sin leer">Pendientes</button>
+    </div>
+
+    <form class="chat-input-row" id="chatForm">
+      <textarea id="chatInput" rows="1" placeholder="Busca un enlace o pide ver tus temas..." autocomplete="off"></textarea>
+      <button type="submit" id="btnChatSend" title="Enviar mensaje">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </form>
+
+    <div class="chat-footer-hint">
+      <i class="fa-solid fa-shield-halved"></i> Historial persistente · Respuestas cortas y directas
+    </div>
+  </section>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="domain-toast-container" id="domainToastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="scripts/api.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>

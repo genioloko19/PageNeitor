@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "Si usas Pageneitor en un trabajo o proyecto, cita esta versión."
+title: "Pageneitor"
+abstract: "Banco visual de enlaces, gestor antitab, asistente local con IA y centro de analítica para el navegador."
+authors:
+  - family-names: "genioloko19"
+    name: "genioloko19"
+repository-code: "https://github.com/genioloko19/PageNeitor"
+url: "https://github.com/genioloko19/PageNeitor"
+license: MIT
+type: software
+version: "3.9.0"
+date-released: "2026-11-02"
+keywords:
+  - enlaces
+  - bookmarks
+  - antitab
+  - ollama
+  - analitica
+  - windows
+  - python
+  - pyside6

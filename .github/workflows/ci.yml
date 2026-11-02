@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Python
+        run: python -m compileall app.py backend build_windows.py
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check JavaScript
+        run: |
+          node --check frontend/scripts/app.js
+          node --check frontend/scripts/api.js
+
+      - name: Check repository hygiene
+        run: |
+          test ! -e pageneitor.db
+          test ! -d dist
+          test ! -d build
+          test ! -d .pyinstaller_build

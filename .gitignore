@@ -218,3 +218,36 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ------------------------------------------------------------
+# Pageneitor project-specific
+# ------------------------------------------------------------
+# Local build workspace and generated specs
+.pyinstaller_build/
+*.spec
+
+# Runtime data and safety copies (never commit user data)
+pageneitor.db
+pageneitor.db-*
+pageneitor_crash.log
+backups/
+exports/
+
+# Electron dependencies
+electron/node_modules/
+
+# Local environment / editor
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Keep the bundled offline vendor assets
+!frontend/vendor/
+

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentación
+    url: https://github.com/genioloko19/PageNeitor#readme
+    about: Instalación, uso, compilación y preguntas frecuentes.
+  - name: Releases
+    url: https://github.com/genioloko19/PageNeitor/releases
+    about: Descarga la última versión para Windows.
